@@ -37,7 +37,6 @@ export class InventoryService {
     inventory.quantity = quantity;
     const updated = await this.inventoryRepo.save(inventory);
 
-    // Emitir evento de dominio
     this.eventEmitter.emit(
       INVENTORY_UPDATED,
       new InventoryUpdatedEvent(
@@ -51,7 +50,6 @@ export class InventoryService {
     return updated;
   }
 
-  // Llamado por el listener cuando se activa un producto
   async initializeStockForVariations(productId: number) {
     const variations = await this.variationRepo.find({
       where: { productId },
@@ -62,7 +60,7 @@ export class InventoryService {
     const records = variations.map((v) =>
       this.inventoryRepo.create({
         productVariationId: v.id,
-        countryCode: 'ARG', // default, extensible
+        countryCode: 'EG', 
         quantity: 0,
       }),
     );

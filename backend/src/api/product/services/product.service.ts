@@ -78,7 +78,6 @@ export class ProductService {
     if (result.affected < 1)
       throw new NotFoundException(errorMessages.product.notFound);
 
-    // Emitir evento de dominio — el módulo de inventario reacciona de forma desacoplada
     this.eventEmitter.emit(
       PRODUCT_ACTIVATED,
       new ProductActivatedEvent(productId, merchantId),
