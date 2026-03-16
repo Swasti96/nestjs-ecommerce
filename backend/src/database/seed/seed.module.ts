@@ -18,6 +18,7 @@ import { CountrySeeder } from './seeders/country.seeder';
 import { CurrencySeeder } from './seeders/currency.seeder';
 import { RolesSeeder } from './seeders/role.seeder';
 import { SizeSeeder } from './seeders/size.seeder';
+import { DemoSeeder } from './seeders/demo.seeder';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { SizeSeeder } from './seeders/size.seeder';
     ColorSeeder,
     CountrySeeder,
     CurrencySeeder,
+    DemoSeeder,
   ],
 })
 export class SeedModule {}

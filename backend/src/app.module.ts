@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmConfigService } from './database/typeorm/typeorm.service';
 import { ApiModule } from './api/api.module';
+import { WebsocketModule } from './websocket/websocket.module';
 import { configuration } from './config';
 
 @Module({
@@ -14,6 +15,7 @@ import { configuration } from './config';
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     EventEmitterModule.forRoot(),
     ApiModule,
+    WebsocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],

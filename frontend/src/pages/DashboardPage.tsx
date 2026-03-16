@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { inventoryApi, productApi } from '../api/client';
 import { usePolling } from '../hooks/usePolling';
+import { useSocket } from '../hooks/useSocket';
 import { ProductCard } from '../components/ProductCard';
 import { InventoryTable } from '../components/InventoryTable';
 import { ApiResponse, InventoryItem, Product } from '../types';
@@ -10,8 +11,8 @@ interface Props {
 }
 
 export function DashboardPage({ onLogout }: Props) {
-  const [productId, setProductId] = useState<string>('1');
-  const [activeProductId, setActiveProductId] = useState<number>(1);
+  const [productId, setProductId] = useState<string>('3');
+  const [activeProductId, setActiveProductId] = useState<number>(3);
 
   const fetchProduct = useCallback(async () => {
     const res = await productApi.getById(activeProductId);
@@ -25,18 +26,37 @@ export function DashboardPage({ onLogout }: Props) {
     return body.data;
   }, [activeProductId]);
 
+  // Polling — arranca deshabilitado, solo activa si WebSocket se cae
   const {
     data: product,
     loading: productLoading,
     lastUpdated: productUpdated,
-  } = usePolling(fetchProduct, 5000);
+    refetch: refetchProduct,
+  } = usePolling(fetchProduct, 60000, false); // false = deshabilitado por defecto
 
   const {
     data: inventory,
     loading: inventoryLoading,
     lastUpdated: inventoryUpdated,
     refetch: refetchInventory,
-  } = usePolling(fetchInventory, 5000);
+  } = usePolling(fetchInventory, 60000, false); // false = deshabilitado por defecto
+
+  // WebSocket — fuente principal de actualizaciones
+  const { isConnected } = useSocket(
+    useCallback(() => {
+      refetchInventory();
+    }, [refetchInventory]),
+    useCallback(() => {
+      refetchProduct();
+      refetchInventory();
+    }, [refetchProduct, refetchInventory]),
+  );
+
+  // Fetch inicial al montar y cuando cambia el producto buscado
+  React.useEffect(() => {
+    refetchProduct();
+    refetchInventory();
+  }, [activeProductId]);
 
   const handleSearch = () => {
     const id = parseInt(productId);
@@ -49,9 +69,20 @@ export function DashboardPage({ onLogout }: Props) {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 style={{ margin: 0, fontSize: 22 }}>Dashboard — E-commerce</h1>
-        <button onClick={onLogout} style={{ padding: '6px 14px', cursor: 'pointer' }}>
-          Cerrar sesión
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{
+            fontSize: 11,
+            padding: '3px 8px',
+            borderRadius: 10,
+            background: isConnected ? '#c6f6d5' : '#feebc8',
+            color: isConnected ? '#276749' : '#744210',
+          }}>
+            {isConnected ? '⚡ WebSocket' : '⏱ Polling fallback'}
+          </span>
+          <button onClick={onLogout} style={{ padding: '6px 14px', cursor: 'pointer' }}>
+            Cerrar sesión
+          </button>
+        </div>
       </div>
 
       {/* Buscador */}
@@ -64,7 +95,10 @@ export function DashboardPage({ onLogout }: Props) {
           style={{ padding: '8px 12px', borderRadius: 4, border: '1px solid #ccc', width: 160 }}
           min={1}
         />
-        <button onClick={handleSearch} style={{ padding: '8px 16px', background: '#3182ce', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}>
+        <button
+          onClick={handleSearch}
+          style={{ padding: '8px 16px', background: '#3182ce', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+        >
           Buscar
         </button>
       </div>
@@ -75,7 +109,7 @@ export function DashboardPage({ onLogout }: Props) {
           <h2 style={{ margin: 0, fontSize: 17 }}>Producto</h2>
           {productUpdated && (
             <span style={{ fontSize: 11, color: '#888' }}>
-              Actualizado: {productUpdated.toLocaleTimeString()} · polling cada 5s
+              Actualizado: {productUpdated.toLocaleTimeString()}
             </span>
           )}
         </div>
@@ -94,7 +128,7 @@ export function DashboardPage({ onLogout }: Props) {
           <h2 style={{ margin: 0, fontSize: 17 }}>Inventario</h2>
           {inventoryUpdated && (
             <span style={{ fontSize: 11, color: '#888' }}>
-              Actualizado: {inventoryUpdated.toLocaleTimeString()} · polling cada 5s
+              Actualizado: {inventoryUpdated.toLocaleTimeString()}
             </span>
           )}
         </div>
