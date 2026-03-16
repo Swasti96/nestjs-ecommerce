@@ -12,6 +12,5 @@ export class InventoryUpdatedListener {
       `Inventory updated — variation ${event.productVariationId}: ` +
       `${event.previousQuantity} → ${event.newQuantity} (${event.reason})`,
     );
-    // Punto de extensión: notificaciones, alertas de stock bajo, auditoría, etc.
   }
 }
