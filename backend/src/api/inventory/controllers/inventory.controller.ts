@@ -4,6 +4,7 @@ import { Auth } from 'src/api/auth/guards/auth.decorator';
 import { RoleIds } from 'src/api/role/enum/role.enum';
 import { FindOneParams } from 'src/common/helper/findOneParams.dto';
 import { IsNumber, IsIn, IsOptional } from 'class-validator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 class UpdateStockDto {
   @IsNumber()
@@ -14,6 +15,7 @@ class UpdateStockDto {
   reason?: 'manual_update' | 'order' | 'adjustment';
 }
 
+@ApiBearerAuth()
 @Controller('inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}

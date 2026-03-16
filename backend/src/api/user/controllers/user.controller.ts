@@ -5,7 +5,10 @@ import { Serialize } from 'src/common/helper/serialize.interceptor';
 import { User } from 'src/database/entities/user.entity';
 import { UserDto } from '../dto/user.dto';
 import { UserService } from '../services/user.service';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+
+@ApiBearerAuth()
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

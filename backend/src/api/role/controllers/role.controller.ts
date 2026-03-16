@@ -3,7 +3,9 @@ import { Auth } from 'src/api/auth/guards/auth.decorator';
 import { AssignRoleDto } from '../dto/role.dto';
 import { RoleIds } from '../enum/role.enum';
 import { RoleService } from '../services/role.service';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('role')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
