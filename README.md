@@ -1,4 +1,4 @@
-# E-commerce Backend — Challenge Sr Fullstack
+# E-commerce Backend — Challenge
 
 Sistema de e-commerce con arquitectura orientada a eventos, construido sobre NestJS y PostgreSQL. Evolucionado desde un monolito con problemas de diseño hacia un modelo event-driven con comunicación en tiempo real via WebSockets.
 
@@ -129,10 +129,6 @@ Reemplazó `JwtModule.register()` para garantizar que el secret se lea una vez q
 ### `typeOrm.config.ts` con carga condicional de `.env`
 
 En desarrollo carga el archivo `development.env` via `dotenv`. En producción (`NODE_ENV=production`) usa directamente las variables de entorno del sistema, que es como Railway (y cualquier plataforma de hosting) las inyecta. Esto elimina la dependencia de archivos de configuración en el filesystem en producción.
-
-### `DemoSeeder` al final del pipeline
-
-Depende de roles, categorías, colores y talles para funcionar. Corre siempre último y es idempotente — verifica si el producto demo ya existe antes de crearlo, por lo que puede correr múltiples veces sin duplicar datos.
 
 ### Eventos como clases TypeScript
 
