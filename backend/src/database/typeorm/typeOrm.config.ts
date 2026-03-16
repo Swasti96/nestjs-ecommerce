@@ -1,12 +1,12 @@
-import { config } from 'dotenv';
-import { resolve } from 'path';
 import { DataSourceOptions } from 'typeorm';
 
-const envPath = resolve(process.cwd(), 'src/common/envs/development.env');
-console.log('>>> ENV PATH:', envPath);
-config({ path: envPath });
-console.log('>>> DB PASSWORD:', process.env.DATABASE_PASSWORD);
-console.log('>>> DB HOST:', process.env.DATABASE_HOST);
+if (process.env.NODE_ENV !== 'production') {
+  const { config } = require('dotenv');
+  const { resolve } = require('path');
+  config({ path: resolve(process.cwd(), 'src/common/envs/development.env') });
+  console.log('>>> DB HOST:', process.env.DATABASE_HOST);
+  console.log('>>> DB PASSWORD:', process.env.DATABASE_PASSWORD);
+}
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
@@ -15,9 +15,9 @@ export const dataSourceOptions: DataSourceOptions = {
   database: process.env.DATABASE_NAME || 'ecommercedb',
   username: process.env.DATABASE_USER || 'hassan',
   password: process.env.DATABASE_PASSWORD || 'password',
-  entities: [process.env.DATABASE_ENTITIES || 'dist/**/*.entity.{ts,js}'],
+  entities: ['dist/**/*.entity.js'],
   migrations: ['dist/database/migration/history/*.js'],
   logger: 'simple-console',
   synchronize: false,
-  logging: true,
+  logging: false,
 };
