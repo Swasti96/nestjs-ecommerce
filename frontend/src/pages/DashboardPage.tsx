@@ -11,8 +11,8 @@ interface Props {
 }
 
 export function DashboardPage({ onLogout }: Props) {
-  const [productId, setProductId] = useState<string>('3');
-  const [activeProductId, setActiveProductId] = useState<number>(3);
+  const [productId, setProductId] = useState<string>('1');
+  const [activeProductId, setActiveProductId] = useState<number>(1);
 
   const fetchProduct = useCallback(async () => {
   try {
