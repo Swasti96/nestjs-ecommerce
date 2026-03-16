@@ -15,33 +15,39 @@ export function DashboardPage({ onLogout }: Props) {
   const [activeProductId, setActiveProductId] = useState<number>(3);
 
   const fetchProduct = useCallback(async () => {
+  try {
     const res = await productApi.getById(activeProductId);
     const body: ApiResponse<Product> = res.data;
     return body.data;
-  }, [activeProductId]);
+  } catch (err) {
+    return null;
+  }
+}, [activeProductId]);
 
   const fetchInventory = useCallback(async () => {
+  try {
     const res = await inventoryApi.getByProduct(activeProductId);
     const body: ApiResponse<InventoryItem[]> = res.data;
     return body.data;
-  }, [activeProductId]);
+  } catch (err) {
+    return null;
+  }
+}, [activeProductId]);
 
-  // Polling — arranca deshabilitado, solo activa si WebSocket se cae
   const {
     data: product,
     loading: productLoading,
     lastUpdated: productUpdated,
     refetch: refetchProduct,
-  } = usePolling(fetchProduct, 60000, false); // false = deshabilitado por defecto
+  } = usePolling(fetchProduct, 60000, false); 
 
   const {
     data: inventory,
     loading: inventoryLoading,
     lastUpdated: inventoryUpdated,
     refetch: refetchInventory,
-  } = usePolling(fetchInventory, 60000, false); // false = deshabilitado por defecto
+  } = usePolling(fetchInventory, 60000, false); 
 
-  // WebSocket — fuente principal de actualizaciones
   const { isConnected } = useSocket(
     useCallback(() => {
       refetchInventory();
@@ -52,7 +58,6 @@ export function DashboardPage({ onLogout }: Props) {
     }, [refetchProduct, refetchInventory]),
   );
 
-  // Fetch inicial al montar y cuando cambia el producto buscado
   React.useEffect(() => {
     refetchProduct();
     refetchInventory();
@@ -66,7 +71,6 @@ export function DashboardPage({ onLogout }: Props) {
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: 24 }}>
 
-      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 style={{ margin: 0, fontSize: 22 }}>Dashboard — E-commerce</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -85,7 +89,7 @@ export function DashboardPage({ onLogout }: Props) {
         </div>
       </div>
 
-      {/* Buscador */}
+
       <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
         <input
           type="number"
@@ -103,7 +107,7 @@ export function DashboardPage({ onLogout }: Props) {
         </button>
       </div>
 
-      {/* Producto */}
+
       <section style={{ marginBottom: 32 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <h2 style={{ margin: 0, fontSize: 17 }}>Producto</h2>
@@ -122,7 +126,7 @@ export function DashboardPage({ onLogout }: Props) {
         )}
       </section>
 
-      {/* Inventario */}
+
       <section>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
           <h2 style={{ margin: 0, fontSize: 17 }}>Inventario</h2>
